@@ -160,12 +160,14 @@
     <ClCompile Include="src\Lve_window.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Lve_device.cpp" />
+    <ClCompile Include="src\Lve_swap_chain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
     <ClInclude Include="src\Lve_pipeline.hpp" />
     <ClInclude Include="src\Lve_window.hpp" />
     <ClInclude Include="src\Lve_device.hpp" />
+    <ClInclude Include="src\Lve_swap_chain.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Simple_Shader.frag" />
