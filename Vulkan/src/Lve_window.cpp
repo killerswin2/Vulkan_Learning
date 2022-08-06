@@ -1,4 +1,5 @@
-#include "Lve_window.h"
+#include "Lve_window.hpp"
+#include "stdexcept"
 
 namespace lve 
 {
@@ -21,6 +22,14 @@ namespace lve
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 		m_Window = glfwCreateWindow(m_Width, m_Height, m_WindowName.c_str(), nullptr, nullptr);
+	}
+
+	void LveWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	{
+		if (glfwCreateWindowSurface(instance, m_Window, nullptr, surface) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create window surface");
+		}
 	}
 
 }
