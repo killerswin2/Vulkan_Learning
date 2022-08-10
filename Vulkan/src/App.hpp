@@ -4,6 +4,7 @@
 #include "Lve_pipeline.hpp"
 #include "Lve_swap_chain.hpp"
 #include "Lve_device.hpp"
+#include "Lve_model.hpp"
 
 #include <memory>
 #include <vector>
@@ -24,6 +25,7 @@ namespace lve
 
 		void run();
 	private:
+		void loadModels();
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
@@ -35,6 +37,6 @@ namespace lve
 		std::unique_ptr<LvePipeline> m_LvePipeline;
 		VkPipelineLayout m_PipelineLayout;
 		std::vector<VkCommandBuffer> m_CommandBuffers;
-		//LvePipeline m_LvePipeline { m_LveDevice, "shaders\\Simple_Shader.vert.spv", "shaders\\Simple_Shader.frag.spv", LvePipeline::DefaultPipeLineConfigInfo(WIDTH, HEIGHT)};
+		std::unique_ptr<LveModel> m_LveModel;
 	};
 }
