@@ -56,6 +56,9 @@
     <ClInclude Include="src\Lve_model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Lve_game_object.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Simple_Shader.vert" />

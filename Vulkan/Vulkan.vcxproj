@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
+    <ClInclude Include="src\Lve_game_object.hpp" />
     <ClInclude Include="src\Lve_model.hpp" />
     <ClInclude Include="src\Lve_pipeline.hpp" />
     <ClInclude Include="src\Lve_window.hpp" />
