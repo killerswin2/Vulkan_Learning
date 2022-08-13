@@ -16,7 +16,7 @@ namespace lve
 
 		struct Vertex
 		{
-			glm::vec2 m_Position;
+			glm::vec3 m_Position;
 			glm::vec3 m_Color;
 
 			static std::vector<VkVertexInputBindingDescription> GetBindingDescriptions();

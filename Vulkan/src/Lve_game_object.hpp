@@ -2,24 +2,49 @@
 
 #include "Lve_model.hpp";
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <memory>
 
 namespace lve
 {
-	struct Transform2dComponent
+	struct TransformComponent
 	{
-		glm::vec2 m_Translation{}; // position offset
-		glm::vec2 m_Scale{1.0f, 1.0f};
-		float m_Rotation;
+		glm::vec3 m_Translation {}; // position offset
+		glm::vec3 m_Scale{1.0f, 1.0f, 1.0f};
+		glm::vec3 m_Rotation;
 
-		glm::mat2 mat2() 
-		{ 
-			const float s = glm::sin(m_Rotation);
-			const float c = glm::cos(m_Rotation);
-			glm::mat2 rotMatrix{ {c, s}, {-s, c} };
 
-			glm::mat2 scaleMat{ {m_Scale.x, 0.0f}, {0.0f, m_Scale.y} };
-			return rotMatrix * scaleMat;
+			// Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
+			// Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
+			// https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+			glm::mat4 mat4() {
+			const float c3 = glm::cos(m_Rotation.z);
+			const float s3 = glm::sin(m_Rotation.z);
+			const float c2 = glm::cos(m_Rotation.x);
+			const float s2 = glm::sin(m_Rotation.x);
+			const float c1 = glm::cos(m_Rotation.y);
+			const float s1 = glm::sin(m_Rotation.y);
+			return glm::mat4{
+				{
+					m_Scale.x * (c1 * c3 + s1 * s2 * s3),
+					m_Scale.x * (c2 * s3),
+					m_Scale.x * (c1 * s2 * s3 - c3 * s1),
+					0.0f,
+				},
+				{
+					m_Scale.y * (c3 * s1 * s2 - c1 * s3),
+					m_Scale.y * (c2 * c3),
+					m_Scale.y * (c1 * c3 * s2 + s1 * s3),
+					0.0f,
+				},
+				{
+					m_Scale.z * (c2 * s1),
+					m_Scale.z * (-s2),
+					m_Scale.z * (c1 * c2),
+					0.0f,
+				},
+				{m_Translation.x, m_Translation.y, m_Translation.z, 1.0f} };
 		}
 		
 	};
@@ -44,7 +69,7 @@ namespace lve
 
 		std::shared_ptr<LveModel> m_Model{};
 		glm::vec3 m_Color{};
-		Transform2dComponent m_Transform2d{};
+		TransformComponent m_Transform{};
 
 	private:
 		LveGameObject(id_t ObjId)

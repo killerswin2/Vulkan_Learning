@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\Lve_camera.cpp" />
     <ClCompile Include="src\Lve_model.cpp" />
     <ClCompile Include="src\Lve_pipeline.cpp" />
     <ClCompile Include="src\Lve_renderer.cpp" />
@@ -167,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.hpp" />
+    <ClInclude Include="src\Lve_camera.hpp" />
     <ClInclude Include="src\Lve_game_object.hpp" />
     <ClInclude Include="src\Lve_model.hpp" />
     <ClInclude Include="src\Lve_pipeline.hpp" />

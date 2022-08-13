@@ -13,8 +13,7 @@ namespace lve {
 
 	struct SimplePushConstantData
 	{
-		glm::mat2 m_Transform{ 1.0f };
-		glm::vec2 m_Offset;
+		glm::mat4 m_Transform{ 1.0f };
 		alignas(16) glm::vec3 m_Color;
 	};
 
@@ -71,18 +70,18 @@ namespace lve {
 
 
 
-	void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects)
+	void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects, const LveCamera& camera)
 	{
 		m_LvePipeline->bind(commandBuffer);
 
 		for (auto& obj : gameObjects)
 		{
-			obj.m_Transform2d.m_Rotation = glm::mod(obj.m_Transform2d.m_Rotation + 0.01f, glm::two_pi<float>());
+			obj.m_Transform.m_Rotation.y = glm::mod(obj.m_Transform.m_Rotation.y + 0.01f, glm::two_pi<float>());
+			obj.m_Transform.m_Rotation.x = glm::mod(obj.m_Transform.m_Rotation.x + 0.005f, glm::two_pi<float>());
 
 			SimplePushConstantData push{};
-			push.m_Offset = obj.m_Transform2d.m_Translation;
 			push.m_Color = obj.m_Color;
-			push.m_Transform = obj.m_Transform2d.mat2();
+			push.m_Transform = camera.getProjection() * obj.m_Transform.mat4();
 
 			vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			obj.m_Model->Bind(commandBuffer);
