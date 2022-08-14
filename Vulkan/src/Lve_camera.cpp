@@ -48,7 +48,7 @@ namespace lve
 	}
 
 	void LveCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
-		//glm::vec3 direction = position - target;
+		//glm::vec3 direction = target - position;
 		//assert(glm::dot(direction, direction) > std::numeric_limits<float>::epsilon() && "Direction must be a non-zero vector");
 		setViewDirection(position, target - position, up);
 	}

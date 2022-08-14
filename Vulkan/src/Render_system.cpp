@@ -78,8 +78,6 @@ namespace lve {
 
 		for (auto& obj : gameObjects)
 		{
-			obj.m_Transform.m_Rotation.y = glm::mod(obj.m_Transform.m_Rotation.y + 0.01f, glm::two_pi<float>());
-			obj.m_Transform.m_Rotation.x = glm::mod(obj.m_Transform.m_Rotation.x + 0.005f, glm::two_pi<float>());
 
 			SimplePushConstantData push{};
 			push.m_Color = obj.m_Color;
