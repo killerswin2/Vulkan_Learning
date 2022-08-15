@@ -158,6 +158,7 @@
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\Keyboard_movement_controller.cpp" />
     <ClCompile Include="src\Lve_camera.cpp" />
+    <ClCompile Include="src\Lve_game_object.cpp" />
     <ClCompile Include="src\Lve_model.cpp" />
     <ClCompile Include="src\Lve_pipeline.cpp" />
     <ClCompile Include="src\Lve_renderer.cpp" />

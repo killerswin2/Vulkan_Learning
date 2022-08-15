@@ -50,6 +50,7 @@ namespace lve
 	{
 		Builder builder{};
 		builder.loadModel(filepath);
+		std::cout << "Vertex count: " << builder.m_Vertices.size() << "\n";
 		return std::make_unique<LveModel>(device, builder);
 	}
 
