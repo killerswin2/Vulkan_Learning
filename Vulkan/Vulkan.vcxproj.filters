@@ -83,7 +83,10 @@
     <ClInclude Include="src\Keyboard_movement_controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\vendor\tinyobjLoader\tiny_obj_loader.h">
+    <ClInclude Include="src\vendor\tinyobjloader\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lve_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

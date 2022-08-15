@@ -1,6 +1,30 @@
 #include "Lve_model.hpp"
+#include "Lve_utils.hpp"
+
+// extern lib
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tinyobjloader/tiny_obj_loader.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 #include <cassert>
+#include <iostream>
+#include <unordered_map>
+
+namespace std
+{
+	template <>
+	struct hash <lve::LveModel::Vertex>
+	{
+		size_t operator()(lve::LveModel::Vertex const& vertex) const
+		{
+			size_t seed = 0;
+			lve::hashCombine(seed, vertex.m_Position, vertex.m_Color, vertex.m_Normal, vertex.m_uv);
+			return seed;
+		}
+	};
+}
+
 namespace lve
 {
 	LveModel::LveModel(LveDevice &device, const LveModel::Builder& builder)
@@ -20,6 +44,13 @@ namespace lve
 			vkDestroyBuffer(m_LveDevice.device(), m_IndexBuffer, nullptr);
 			vkFreeMemory(m_LveDevice.device(), m_IndexBufferMemory, nullptr);
 		}
+	}
+
+	std::unique_ptr<LveModel> LveModel::createModelFromFile(LveDevice& device, const std::string& filepath)
+	{
+		Builder builder{};
+		builder.loadModel(filepath);
+		return std::make_unique<LveModel>(device, builder);
 	}
 
 	void LveModel::CreateVertexBuffers(const std::vector<Vertex>& vertices)
@@ -129,16 +160,81 @@ namespace lve
 
 	std::vector<VkVertexInputAttributeDescription> LveModel::Vertex::GetAttributeDescriptions()
 	{
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
-		attributeDescriptions[0].binding = 0;
-		attributeDescriptions[0].location = 0;
-		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[0].offset = offsetof(Vertex, m_Position);
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 
-		attributeDescriptions[1].binding = 0;
-		attributeDescriptions[1].location = 1;
-		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[1].offset = offsetof(Vertex, m_Color);
+		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, m_Position) });
+		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, m_Color) });
+		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, m_Normal) });
+		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, m_uv) });
+
+
 		return attributeDescriptions;
+	}
+
+	void LveModel::Builder::loadModel(const std::string& filepath)
+	{
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> material;
+		std::string warn, err;
+
+		if (!tinyobj::LoadObj(&attrib, &shapes, &material, &warn, &err, filepath.c_str()))
+		{
+			throw std::runtime_error(warn + err);
+		}
+
+		m_Vertices.clear();
+		m_Indices.clear();
+
+		std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+		for (const auto& shape : shapes)
+		{
+			for (const auto& index : shape.mesh.indices)
+			{
+				Vertex vertex{};
+
+				if (index.vertex_index >= 0)
+				{
+					vertex.m_Position = {
+						attrib.vertices[3 * index.vertex_index + 0],
+						attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 2],
+					};
+
+					vertex.m_Color = {
+						attrib.colors[3 * index.vertex_index + 0],
+						attrib.colors[3 * index.vertex_index + 1],
+						attrib.colors[3 * index.vertex_index + 2],
+					};
+
+					
+				}
+
+
+				if (index.normal_index >= 0)
+				{
+					vertex.m_Normal = {
+						attrib.normals[3 * index.normal_index + 0],
+						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 2],
+					};
+				}
+
+				if (index.texcoord_index >= 0)
+				{
+					vertex.m_uv = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						attrib.texcoords[2 * index.texcoord_index + 1],
+					};
+				}
+
+				if (uniqueVertices.count(vertex) == 0)
+				{
+					uniqueVertices[vertex] = static_cast<uint32_t>(m_Vertices.size());
+					m_Vertices.push_back(vertex);
+				}
+				m_Indices.push_back(uniqueVertices[vertex]);
+			}
+		}
 	}
 }

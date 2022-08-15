@@ -168,6 +168,7 @@
     <ClCompile Include="src\Render_system.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Lve_utils.hpp" />
     <ClInclude Include="src\App.hpp" />
     <ClInclude Include="src\Keyboard_movement_controller.hpp" />
     <ClInclude Include="src\Lve_camera.hpp" />
@@ -179,7 +180,7 @@
     <ClInclude Include="src\Lve_device.hpp" />
     <ClInclude Include="src\Lve_swap_chain.hpp" />
     <ClInclude Include="src\Render_system.hpp" />
-    <ClInclude Include="src\vendor\tinyobjLoader\tiny_obj_loader.h" />
+    <ClInclude Include="src\vendor\tinyobjloader\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Simple_Shader.frag" />
