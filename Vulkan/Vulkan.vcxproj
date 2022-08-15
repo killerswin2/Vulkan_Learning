@@ -179,6 +179,7 @@
     <ClInclude Include="src\Lve_device.hpp" />
     <ClInclude Include="src\Lve_swap_chain.hpp" />
     <ClInclude Include="src\Render_system.hpp" />
+    <ClInclude Include="src\vendor\tinyobjLoader\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\Simple_Shader.frag" />
