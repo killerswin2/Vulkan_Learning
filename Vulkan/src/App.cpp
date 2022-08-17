@@ -2,6 +2,7 @@
 #include "Keyboard_movement_controller.hpp"
 #include "Render_system.hpp"
 #include "Lve_camera.hpp"
+#include "Lve_buffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -11,10 +12,16 @@
 #include <stdexcept>
 #include <chrono>
 #include <array>
+#include <numeric>
 #include <cassert>
 
 namespace lve {
 
+	struct GlobalUbo
+	{
+		alignas(16) glm::mat4 m_projectionView{ 1.0f };
+		alignas(16) glm::vec3 m_LightDirection = glm::normalize(glm::vec3{ 1.0f, -3.0f, -1.0f });
+	};
 
 	FirstApp::FirstApp()
 	{
@@ -28,6 +35,21 @@ namespace lve {
 
 	void FirstApp::run()
 	{
+		auto minOffsetAlignment = std::lcm(
+			m_LveDevice.properties.limits.minUniformBufferOffsetAlignment,
+			m_LveDevice.properties.limits.nonCoherentAtomSize);
+
+		LveBuffer globalUboBuffer{ 
+			m_LveDevice, 
+			sizeof(GlobalUbo),
+			LveSwapChain::MAX_FRAMES_IN_FLIGHT,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+			minOffsetAlignment
+		};
+
+		globalUboBuffer.map();
+
 		RenderSystem renderSystem{m_LveDevice, m_LveRenderer.getSwapChainRenderPass()};
         LveCamera camera{};
         camera.setViewTarget(glm::vec3{ 0.0f, 0.0f, 5.0f }, glm::vec3{ 0.0f, 0.0f, 2.5f });
@@ -54,8 +76,23 @@ namespace lve {
 
 			if (auto commandBuffer = m_LveRenderer.beginFrame()) 
 			{
+				int frameIndex = m_LveRenderer.getFrameIndex();
+				FrameInfo frameInfo{
+					frameIndex,
+					frameTime,
+					commandBuffer,
+					camera
+				};
+
+				// update
+				GlobalUbo ubo{};
+				ubo.m_projectionView = camera.getProjection() * camera.getView();
+				globalUboBuffer.writeToIndex(&ubo, frameIndex);
+				globalUboBuffer.flushIndex(frameIndex);
+
+				// render
 				m_LveRenderer.beginSwapChainRenderPass(commandBuffer);
-				renderSystem.renderGameObjects(commandBuffer, m_GameObjects, camera);
+				renderSystem.renderGameObjects(frameInfo, m_GameObjects);
 				m_LveRenderer.endSwapChainRenderPass(commandBuffer);
 				m_LveRenderer.endFrame();
 			}

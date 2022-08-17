@@ -70,11 +70,11 @@ namespace lve {
 
 
 
-	void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<LveGameObject>& gameObjects, const LveCamera& camera)
+	void RenderSystem::renderGameObjects(FrameInfo & frameInfo, std::vector<LveGameObject>& gameObjects)
 	{
-		m_LvePipeline->bind(commandBuffer);
+		m_LvePipeline->bind(frameInfo.m_CommandBuffer);
 
-		auto projectionView = camera.getProjection() * camera.getView();
+		auto projectionView = frameInfo.m_Camera.getProjection() * frameInfo.m_Camera.getView();
 
 		for (auto& obj : gameObjects)
 		{
@@ -84,9 +84,9 @@ namespace lve {
 			push.m_Transform = projectionView * modelMatrix;
 			push.m_NormalMatrix = obj.m_Transform.normalMatrix();
 
-			vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
-			obj.m_Model->Bind(commandBuffer);
-			obj.m_Model->Draw(commandBuffer);
+			vkCmdPushConstants(frameInfo.m_CommandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
+			obj.m_Model->Bind(frameInfo.m_CommandBuffer);
+			obj.m_Model->Draw(frameInfo.m_CommandBuffer);
 		}
 	}
 
